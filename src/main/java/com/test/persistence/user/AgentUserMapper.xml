@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.test.persistence.user.AgentUserMapper">
+	<!-- 根据用户名查询 -->
+	<select id="selectUserByUserName" parameterType="java.lang.String" resultType="com.test.pojo.AgentUser">
+	    SELECT *
+	    FROM t_user
+	    WHERE mobileNo = #{mobileNo}
+	    
+	</select>
+	
+	<select id="selectUser" parameterType="java.lang.String" resultType="com.test.pojo.AgentUser">
+	    SELECT *
+	    FROM t_user
+	    WHERE 1 = 1
+	    ORDER BY id
+	</select>
+	
+	<insert id="saveUser" parameterType="com.test.pojo.AgentUser">
+		insert into t_user (id,userName,password,salt,removeTime,mobileNo) values 
+		(null,null,#{password},#{salt},null,#{mobileNo})
+	</insert>
+</mapper>
