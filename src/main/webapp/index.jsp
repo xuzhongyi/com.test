@@ -4,6 +4,28 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Insert title here</title>
+<script src="jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+
+function test(){
+	$.ajax({
+		type : 'post',
+		url : '/line/linePo',
+		data : '{"id":1}',
+		contentType: "application/json; charset=utf-8",
+		cache : false,
+		dataType : 'json',
+		success : function(data) {
+			if(data.returnCode==1){
+			}else{
+				swal("系统提示", data.msg,"error");
+			}
+		}
+	});
+}
+
+
+</script>
 </head>
 <body>
 	<%
@@ -30,6 +52,6 @@
 		<input type="text" name="validNo">
 		<input type="submit" value="登录">
 	</form>
-	
+	<input type="button" onclick="test()" value="登录">
 </body>
 </html>

@@ -14,6 +14,18 @@ public class RandomUtil {
 		return strBuil.toString();
 	}
 	
+	public static String randomCode(){
+		StringBuilder strBuil=new StringBuilder();
+		final String[] strArray=new String[]{"0","1","2","3","4","5","6","7",
+				"8","9"};
+		for(int i=0;i<6;i++){
+			int random = (int)(Math.random()*10);
+			strBuil.append(strArray[random]);
+		}
+		return strBuil.toString();
+	}
+	
+	
 	public static void main(String[] args){
 		random();
 	}

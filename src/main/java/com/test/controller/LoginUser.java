@@ -16,6 +16,7 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ import com.test.po.AgentUserPo;
 import com.test.pojo.AgentUser;
 import com.test.pojo.ResoultData;
 import com.test.service.UserService;
+import com.test.util.AliSSM;
 import com.test.util.RandomUtil;
 import com.test.util.ThreadUtil;
 import com.test.valid.PamaMethod;
@@ -46,9 +48,7 @@ public class LoginUser {
 	
 	@Autowired
 	private UserService userService;
-	
-	
-	
+
 	/**
 	 * 
 	 * login:(登录). <br/>
@@ -73,7 +73,7 @@ public class LoginUser {
 			Map<String, String> map = valid.get();
 			for(String str:map.keySet()){
 				data.setCore(str);
-				data.setData(map.get(str));
+				data.setMsg(map.get(str));
 			}
 			JSONObject object = JSONObject.fromObject(data);
 			return object.toString();
@@ -89,28 +89,28 @@ public class LoginUser {
 		catch(UnknownAccountException e)
 		{
 			data.setCore("false");
-			data.setData("号码未注册");
+			data.setMsg("号码未注册");
 			JSONObject object = JSONObject.fromObject(data);
 			return object.toString();
 		}
 		catch(IncorrectCredentialsException e)
 		{
 			data.setCore("false");
-			data.setData("用户名/密码错误");
+			data.setMsg("用户名/密码错误");
 			JSONObject object = JSONObject.fromObject(data);
 			return object.toString();
 		}
 		catch(Exception e)
 		{
 			data.setCore("false");
-			data.setData("登录失败(可能是登录太多次失败，请等10分钟)");
+			data.setMsg("登录失败(可能是登录太多次失败，请等10分钟)");
 			JSONObject object = JSONObject.fromObject(data);
 			return object.toString();
 		}
 		if(!isAuthenticated)
 		{
 			data.setCore("false");
-			data.setData("用户名密码错误");
+			data.setMsg("用户名密码错误");
 			JSONObject object = JSONObject.fromObject(data);
 			return object.toString();
 		}
@@ -203,26 +203,36 @@ public class LoginUser {
 			Map<String, String> map = valid.get();
 			for (String str : map.keySet()) {
 				data.setCore(str);
-				data.setData(map.get(str));
+				data.setMsg(map.get(str));
 			}
 		} else {
 			// 判断用户是否已经注册了
 			AgentUser agentUser = userService.getUserByUserName(agentMobile.getMobileNo());
 			if (null != agentUser) {
 				data.setCore("false");
-				data.setData("手机号码已注册");
+				data.setMsg("手机号码已注册");
 				JSONObject object = JSONObject.fromObject(data);
 				return object.toString();
 			}
 			
 			//发送短信  TODO
+			String code = RandomUtil.randomCode();
+			try{
+				userService.sendPhone(code, agentMobile.getMobileNo());
+			}catch(Exception e){
+				data.setCore("false");
+				data.setData("手机验证码发送失败");
+				JSONObject object = JSONObject.fromObject(data);
+				return object.toString();
+			}
+			
 			data.setCore("true");
-			data.setData("123456");
+			data.setData(code);
 
 			// 将短信发送的验证放入redis保存时间5分钟
 			Object object = redisService.get(agentMobile.getMobileNo());
 			if (null == object || "".equals(object)) {
-				redisService.set(agentMobile.getMobileNo(), "123456", 60 * 5L);
+				redisService.set(agentMobile.getMobileNo(), code, 60 * 5L);
 			}
 		}
 		JSONObject object = JSONObject.fromObject(data);
@@ -244,7 +254,7 @@ public class LoginUser {
 			Map<String, String> map = valid.get();
 			for(String str:map.keySet()){
 				data.setCore(str);
-				data.setData(map.get(str));
+				data.setMsg(map.get(str));
 			}
 		}else{
 			//验证码验证
@@ -253,7 +263,7 @@ public class LoginUser {
 				data=userService.saveUser(user);
 			}else{
 				data.setCore("false");
-				data.setData("验证码错误");
+				data.setMsg("验证码错误");
 			}
 		}
 		JSONObject object = JSONObject.fromObject(data);

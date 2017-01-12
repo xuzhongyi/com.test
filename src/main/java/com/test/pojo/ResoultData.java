@@ -4,8 +4,9 @@ public class ResoultData {
 
 	private String core;
 	
-	private String data;
+	private String msg;
 
+	private Object data;
 	public String getCore() {
 		return core;
 	}
@@ -14,14 +15,19 @@ public class ResoultData {
 		this.core = core;
 	}
 
-	public String getData() {
+	public String getMsg() {
+		return msg;
+	}
+
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
+
+	public Object getData() {
 		return data;
 	}
 
-	public void setData(String data) {
+	public void setData(Object data) {
 		this.data = data;
 	}
-	
-	
-	
 }
